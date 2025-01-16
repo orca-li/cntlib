@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<title>cntlib</title>
+<style>
+  body {
+    font-family: DejaVu Sans, serif;
+  }
+
+  .align-center {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  .styled-quote {
+    border: none;
+    box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #fff;
+  }
+
+  .styled-quote p {
+    font-size: 16px;
+    font-style: italic;
+  }
+
+  .styled-quote footer {
+    margin-top: 10px;
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+  }
+</style>
+
+<body>
+  <h1>cntlib | about</h1>
+  <h2>STYLE</h2>
+  <p>
+    I developed this programming style for writing large amounts of code solo. This was driven by three problems:
+  </p>
+  <ul>
+    <li>I write code and work alone</li>
+    <li>I don't have a modular and flexible architecture</li>
+    <li>It's hard to come up with algorithms</li>
+  </ul>
+  <p>All three of these problems are solved by doing the following:</p>
+  <ul>
+    <li>Don't write code alone</li>
+    <li>Study other people's programming styles</li>
+    <li>Learn existing algorithms and don't reinvent the wheel</li>
+  </ul>
+  <p>But all three of these solutions don't work for me for one reason. I don't want to spend my time. I want to manage
+    processes, not be immersed in them. It's very difficult to find like-minded people you can lead, and I want to
+    oversee
+    everything. So, you have a problem. You're alone. Don't despair, use this problem as an advantage. If you're alone,
+    it probably means nobody needs your code. This means that nobody will check your code's performance. It means that
+    nobody needs your algorithms. Therefore, there's no point in spending time on good algorithms. Your goal is to write
+    algorithms as quickly as possible, even if they're stupid.
+  </p>
+  <blockquote class='styled-quote'>
+    <p>"Don't think"</p>
+    <footer>(c) The library’s motto</footer>
+  </blockquote>
+  <p>My next goal in programming is mastering code and project architecture. I aspire to design high-level architectural
+    solutions. I find it difficult to independently conceive of architecture for extended periods. Essentially, when
+    creating
+    something for the first time - a driver, for instance spending excessive time on architecture is unproductive.
+    You'll
+    inevitably rewrite in numerous times. Furthermore, in an OOP paradigm, determining which objects to create and where
+    to
+    begin is significant challenge. Essentially, <code>cntlib</code> could serve as a core component for any object, If
+    you're
+    working with enumerations, numbers, items, coordinates, etc., <code>cntlib</code> provides a solid foundation for
+    the objects
+    you'll need to develop. My approach isn't to design an architecture and then force the code to conform; rather, I
+    aim to
+    write code that organically shapes the architecture. Perhaps I've finally arrived at a true understanding of OOP.
+  </p>
+  <h2>POINTER OR COUNTER?</h2>
+  <p>
+    You're basically living and breathing pointers when you're coding in C. I remeber that time I tried to make the
+    <code>%b</code> specifier
+    work for my <code>printf()</code>. It took me a week, and I still didn't get it right because I ran out time and had
+    a mountain
+    of bugs. You'd think printing bits would be simple, right? But oh no, I had to make my own protocol. It ended up
+    with a thousand
+    lines of code, tons of bugs, and unreadable algorithms that I didn't even want to look at. I was parsing text and
+    writing all kinds
+    of complicated things, but it would be way too much for a beginner.<br><br>
+
+    The last straw was trying to write a FAT32 file system driver. Instead of text, I was dealing with all kinds of byte
+    fields. It
+    was pointer madness all over again. I'd go to an address, reset it, or not. Sometimes I needed to save, sometimes
+    not. What's the
+    best way to read and process bytes? Do you pass a number or a pointer? Where do you put this stuff? And what do you
+    call it? And
+    don't even get me started on encapsulation. The whole thing turned into a coding disaster, and I lost all motivation
+    to keep
+    working on it.<br><br>
+
+    Pointers, pointers, pointers, everywhere. So many pointers! Will it ever stop? Finally, OOP comes to the rescue! But
+    methods? Those
+    are just pointers to functions. Although, we call those interfaces in C. There are just so many different types of
+    pointers, and their
+    meaning keeps changing. And those algorithms change with the types, yet we call them all pointers.<br><br>
+
+    When learning C, eventually you're going to have to deal with linker scripts and this "location counter" idea. It's
+    basically "just add one".
+    And you can choose where you're starting from. This is how I got the first idea for the object in my library.
+  </p>
+  <pre><code>
+typedef struct LOCATION_COUNTER_TYPE
+{
+  size_t c;
+  char* p;
+} loccnt_t;
+</code></pre>
+  <p>
+    Obviously, this approach will die at the encapsulation stage. When a location counter is nested inside other
+    location counters, like a
+    matryoshka doll. Moreover, their steps may differ. Therefore, you will come to this system.
+  </p>
+  <pre><code>
+typedef struct LOCACTION_COUNTER_TYPE
+{
+  unsigned char stepsz;
+  size_t c;
+  char* p;
+} loccnt_t;
+</code></pre>
+  <p>
+    But even that won't help you, because you'll end up with such ugly code:
+  </p>
+  <pre><code>
+void foo(char* buffer)
+{
+  clustercnt clscnt = {
+    .stepsz = sizeof(sectorcnt),
+    .c = 0,
+    .p = buffer,
+    .sectorcnt = {
+      .stepsz = SECTORSIZE,
+      .c = 0,
+      .p = buffer,
+      .loccnt = {
+        .stepsz = 1,
+        .c = 0,
+        .p = buffer
+      }
+    }
+  };
+}
+</code></pre>
+  <p>
+    And that's just the beginning of your problems! Just think about all the functions(methods) you'll still have to
+    write. I won't event list the number of terrible problems that await you. Furthermore, all these pointers are
+    closely related,
+    and you'll have to combine this monstrosity, with different region sizes, and sometimes you'll need to write to
+    two tables simultaneously!!! What are you going to do with this Tower of Babel?
+  </p>
+  <h2>TOWERS FALL</h2>
+  <p>
+    You work and write code alone. You have little time because developing in C requires vast knowledge, a lot of code,
+    and a lon learning period. Algorithms and code architecture shouldn't concern you; otherwise, you won't get anything
+    done. I said at the beginning of this chapter, leave the algorithms to other programmers. Perhaps you'll just
+    abandon
+    the project because you'll realize that nobody needs it. Your code is not needed by anyone - this is the most common
+    ending for a lot of code. And writing code is a huge waste of time. I often abandoned my projects because I
+    understood
+    that nobody needed them. And that was the right thing to do. Especially for young programmers, the growth of your
+    knowledge
+    will often change the course of your ship. This is called intellect and development. Changing direction is often
+    right
+    and necessary. If you've changed course, it means you've realized that you were striving for an unnecessary goal.
+    You need
+    to change the goal if it's not needed. You don't need to change the goal if the goal is needed. Achieve and don't
+    give up.
+    But in most cases, we are often foolish, so we are thrown from side to side, which means we are developing.<br><br>
+
+    When you write algorithms and work with pointers, somethins similar will start to emerge.
+  </p>
+  <pre><code>
+extern char array[1000][]; // pointer 1
+
+int foo(size_t); // pointer 2
+
+int main()
+{
+  char* const base = &array[0]; // pointer 3
+  char* cursor = base; // pointer 4
+  void (*method)(void) = foo; // pointer 5
+  void (* const cmethod) = foo; // pointer 6
+  char** sort = &array[0] // pointer 7
+
+  // code
+
+  return 0;
+}
+
+int foo(size_t sz) // counter 1
+{
+  while(sz--)
+  {
+    // code
+
+    for (size_t i = 0; i < MACROS; i++) // counter 2 
+    { 
+      // code 
+    } 
+    // code 
+  } 
+  // code 
+  return 0; 
+} 
+</code></pre>
+  <p>
+    It doesn't matter what's happening in the code, the very structure itself is repulsive. You started writing this
+    code,
+    you had ideas, thoughts, you were in the flow. A week passed, a bug appeared, and the code is disgusting. You don't
+    want
+    to debug it, you don't want to see it. Moreover, you're iterating with pointers here, there are many of them,
+    they're complex.
+    In addition, looking at the algorithms, you don't immediately understand what's going on. Good names often don't
+    help
+    either because you don't have abstractions yet, you're writing the code for the first time. And creating
+    abstractions means
+    anticipating all the problems in advance. Furthermore, preparation takes a lot of time. You're alone, and it's
+    unlikely that
+    anyone else will join you. Therefore, you can't waste time, just write the code.<br><br>
+
+    You probably won't have any architecture for connecting and compiling files either. You'll have a chaotic mess of
+    header files
+    apprearing, which will be included multiple times. Layers will accumulate, and you can't predict the order in which
+    each layer
+    apprears. Everything new will be wonderful, and everything old will be hideous. Therefore, you need some kind of
+    solution. Chess
+    players know that you need to play chess with a plan. It's better to play with a bad plan than with no plan at all.
+  </p>
+  <h2>RENAISSANCE</h2>
+  <p>
+    This library provides you with an OOP-style core for working with pointers and core modifiers that suggest to during
+    initialization
+    what types of algorithms await you, what definitely exists, and what definitely won't exist. Connecting the core and
+    initialization
+    provides comprehensive information about the algorithms and also suggests and provides templates for writing these
+    algorithms. OOP style
+    is architectural self-construction, Just forget about everything! Write code, and let others finish it. If your code
+    is still not
+    needed by anyone, you'll lose far less time. And if someone does need it, that's someone else's headache. Create
+    tasks, lead.<br><br>
+
+    In the following chapters, there will be a comprehensive guide and rich examples on how to use it.
+  </p>
+</body>
+
+</html>
